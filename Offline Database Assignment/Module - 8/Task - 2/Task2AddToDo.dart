@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'Task2DB.dart';
 
 class Task2addtodo extends StatefulWidget {
@@ -10,7 +9,6 @@ class Task2addtodo extends StatefulWidget {
 }
 
 class _Task2addtodoState extends State<Task2addtodo> {
-
   final _addNote = GlobalKey<FormState>();
   TextEditingController title = TextEditingController();
   MyDb dbHelper = MyDb.instance;
@@ -33,7 +31,7 @@ class _Task2addtodoState extends State<Task2addtodo> {
                 TextFormField(
                   controller: title,
                   validator: (value) =>
-                  value!.isEmpty ? 'Please Enter Title!' : null,
+                  value!.isEmpty ? 'Please Enter Titles!' : null,
                   decoration: InputDecoration(
                     labelText: 'Title',
                     border: OutlineInputBorder(),
@@ -41,7 +39,7 @@ class _Task2addtodoState extends State<Task2addtodo> {
                 ),
                 SizedBox(height: 12),
                 ElevatedButton(
-                  onPressed: () async{
+                  onPressed: () async {
                     if (_addNote.currentState!.validate()) {
                       await _insert();
                       Navigator.pop(context);
@@ -57,9 +55,11 @@ class _Task2addtodoState extends State<Task2addtodo> {
     );
   }
 
+  // Method to insert data into the database
   Future<void> _insert() async {
     Map<String, dynamic> row = {
       MyDb.title: title.text,
+      MyDb.isDone: 0,
     };
 
     final id = await dbHelper.insertdata(row);
@@ -67,5 +67,4 @@ class _Task2addtodoState extends State<Task2addtodo> {
 
     title.clear();
   }
-
 }
