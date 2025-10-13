@@ -11,7 +11,7 @@ if(empty($email) || empty($password)){
 }
 
 // Fetch user
-$q = "SELECT * FROM g_users WHERE email='$email'";
+$q = "SELECT * FROM g_artist_users WHERE email='$email'";
 $res = mysqli_query($con, $q);
 
 if(mysqli_num_rows($res) == 0){

@@ -25,7 +25,7 @@ if(mysqli_num_rows($check) > 0){
 $hashed = password_hash($password, PASSWORD_BCRYPT);
 
 // Insert new user
-$q = "INSERT INTO g_users (name, email, password, phone, address, role, status) 
+$q = "INSERT INTO g_artist_users (name, email, password, phone, address, role, status) 
       VALUES ('$name', '$email', '$hashed', '$phone', '$address', '$role', 'pending')";
 
 if(mysqli_query($con, $q)){
