@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 12, 2025 at 06:42 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Oct 13, 2025 at 07:59 PM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.0.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `g_categories`
+-- Table structure for table `gr_categories`
 --
 
-CREATE TABLE `g_categories` (
+CREATE TABLE `gr_categories` (
   `category_id` int(11) NOT NULL,
   `category_name` varchar(100) NOT NULL,
   `description` text DEFAULT NULL
@@ -36,10 +36,10 @@ CREATE TABLE `g_categories` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `g_questions`
+-- Table structure for table `gr_questions`
 --
 
-CREATE TABLE `g_questions` (
+CREATE TABLE `gr_questions` (
   `question_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `question_text` text NOT NULL,
@@ -52,10 +52,10 @@ CREATE TABLE `g_questions` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `g_rto_offices`
+-- Table structure for table `gr_rto_offices`
 --
 
-CREATE TABLE `g_rto_offices` (
+CREATE TABLE `gr_rto_offices` (
   `office_id` int(11) NOT NULL,
   `state_name` varchar(100) NOT NULL,
   `office_code` varchar(10) NOT NULL,
@@ -68,10 +68,10 @@ CREATE TABLE `g_rto_offices` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `g_statistics`
+-- Table structure for table `gr_statistics`
 --
 
-CREATE TABLE `g_statistics` (
+CREATE TABLE `gr_statistics` (
   `stat_id` int(11) NOT NULL,
   `year` varchar(20) DEFAULT NULL,
   `transport_vehicles` int(11) DEFAULT NULL,
@@ -82,10 +82,10 @@ CREATE TABLE `g_statistics` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `g_tests`
+-- Table structure for table `gr_tests`
 --
 
-CREATE TABLE `g_tests` (
+CREATE TABLE `gr_tests` (
   `test_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `test_type` enum('practice','mock') NOT NULL,
@@ -99,10 +99,10 @@ CREATE TABLE `g_tests` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `g_test_answers`
+-- Table structure for table `gr_test_answers`
 --
 
-CREATE TABLE `g_test_answers` (
+CREATE TABLE `gr_test_answers` (
   `answer_id` int(11) NOT NULL,
   `test_id` int(11) NOT NULL,
   `question_id` int(11) NOT NULL,
@@ -113,10 +113,10 @@ CREATE TABLE `g_test_answers` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `g_users`
+-- Table structure for table `gr_users`
 --
 
-CREATE TABLE `g_users` (
+CREATE TABLE `gr_users` (
   `user_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
@@ -129,49 +129,49 @@ CREATE TABLE `g_users` (
 --
 
 --
--- Indexes for table `g_categories`
+-- Indexes for table `gr_categories`
 --
-ALTER TABLE `g_categories`
+ALTER TABLE `gr_categories`
   ADD PRIMARY KEY (`category_id`);
 
 --
--- Indexes for table `g_questions`
+-- Indexes for table `gr_questions`
 --
-ALTER TABLE `g_questions`
+ALTER TABLE `gr_questions`
   ADD PRIMARY KEY (`question_id`),
   ADD KEY `category_id` (`category_id`);
 
 --
--- Indexes for table `g_rto_offices`
+-- Indexes for table `gr_rto_offices`
 --
-ALTER TABLE `g_rto_offices`
+ALTER TABLE `gr_rto_offices`
   ADD PRIMARY KEY (`office_id`);
 
 --
--- Indexes for table `g_statistics`
+-- Indexes for table `gr_statistics`
 --
-ALTER TABLE `g_statistics`
+ALTER TABLE `gr_statistics`
   ADD PRIMARY KEY (`stat_id`);
 
 --
--- Indexes for table `g_tests`
+-- Indexes for table `gr_tests`
 --
-ALTER TABLE `g_tests`
+ALTER TABLE `gr_tests`
   ADD PRIMARY KEY (`test_id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `g_test_answers`
+-- Indexes for table `gr_test_answers`
 --
-ALTER TABLE `g_test_answers`
+ALTER TABLE `gr_test_answers`
   ADD PRIMARY KEY (`answer_id`),
   ADD KEY `test_id` (`test_id`),
   ADD KEY `question_id` (`question_id`);
 
 --
--- Indexes for table `g_users`
+-- Indexes for table `gr_users`
 --
-ALTER TABLE `g_users`
+ALTER TABLE `gr_users`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `email` (`email`);
 
@@ -180,45 +180,45 @@ ALTER TABLE `g_users`
 --
 
 --
--- AUTO_INCREMENT for table `g_categories`
+-- AUTO_INCREMENT for table `gr_categories`
 --
-ALTER TABLE `g_categories`
+ALTER TABLE `gr_categories`
   MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `g_questions`
+-- AUTO_INCREMENT for table `gr_questions`
 --
-ALTER TABLE `g_questions`
+ALTER TABLE `gr_questions`
   MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `g_rto_offices`
+-- AUTO_INCREMENT for table `gr_rto_offices`
 --
-ALTER TABLE `g_rto_offices`
+ALTER TABLE `gr_rto_offices`
   MODIFY `office_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `g_statistics`
+-- AUTO_INCREMENT for table `gr_statistics`
 --
-ALTER TABLE `g_statistics`
+ALTER TABLE `gr_statistics`
   MODIFY `stat_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `g_tests`
+-- AUTO_INCREMENT for table `gr_tests`
 --
-ALTER TABLE `g_tests`
+ALTER TABLE `gr_tests`
   MODIFY `test_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `g_test_answers`
+-- AUTO_INCREMENT for table `gr_test_answers`
 --
-ALTER TABLE `g_test_answers`
+ALTER TABLE `gr_test_answers`
   MODIFY `answer_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `g_users`
+-- AUTO_INCREMENT for table `gr_users`
 --
-ALTER TABLE `g_users`
+ALTER TABLE `gr_users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -226,23 +226,23 @@ ALTER TABLE `g_users`
 --
 
 --
--- Constraints for table `g_questions`
+-- Constraints for table `gr_questions`
 --
-ALTER TABLE `g_questions`
-  ADD CONSTRAINT `g_questions_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `g_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gr_questions`
+  ADD CONSTRAINT `gr_questions_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `gr_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `g_tests`
+-- Constraints for table `gr_tests`
 --
-ALTER TABLE `g_tests`
-  ADD CONSTRAINT `g_tests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `g_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gr_tests`
+  ADD CONSTRAINT `gr_tests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `gr_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `g_test_answers`
+-- Constraints for table `gr_test_answers`
 --
-ALTER TABLE `g_test_answers`
-  ADD CONSTRAINT `g_test_answers_ibfk_1` FOREIGN KEY (`test_id`) REFERENCES `g_tests` (`test_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `g_test_answers_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `g_questions` (`question_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gr_test_answers`
+  ADD CONSTRAINT `gr_test_answers_ibfk_1` FOREIGN KEY (`test_id`) REFERENCES `gr_tests` (`test_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `gr_test_answers_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `gr_questions` (`question_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

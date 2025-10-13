@@ -1,14 +1,16 @@
 <?php
 include 'connect.php';
-header('Content-Type: application/json');
 
-$id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-if (!$id) { echo json_encode(['success'=>false,'message'=>'ID required']); exit; }
+$id = intval($_POST['id'] ?? 0);
+if (!$id) {
+    echo json_encode(['success' => false, 'message' => 'ID required']);
+    exit;
+}
 
-$sql = "DELETE FROM g_users WHERE user_id=$id";
+$sql = "DELETE FROM gr_users WHERE user_id = $id";
 if ($con->query($sql)) {
-    echo json_encode(['success'=>true,'message'=>'User deleted']);
+    echo json_encode(['success' => true, 'message' => 'User deleted']);
 } else {
-    echo json_encode(['success'=>false,'message'=>'Delete failed']);
+    echo json_encode(['success' => false, 'message' => 'Delete failed']);
 }
 ?>
