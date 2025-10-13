@@ -1,0 +1,49 @@
+<?php
+echo "<h2>Gaurang API</h2>";
+echo "<ul>";
+
+// User APIs
+echo "<li><a href='gaurang/register.php'>Register User</a></li>";
+echo "<li><a href='gaurang/login.php'>Login User</a></li>";
+echo "<li><a href='gaurang/update_user.php'>Update User</a></li>";
+echo "<li><a href='gaurang/delete_user.php'>Delete User</a></li>";
+echo "<li><a href='gaurang/view_all_users.php'>Get All Users</a></li>";
+
+// Artist APIs
+echo "<li><a href='gaurang/add_artist.php'>Add Artist</a></li>";
+echo "<li><a href='gaurang/update_artist.php'>Update Artist</a></li>";
+echo "<li><a href='gaurang/delete_artist.php'>Delete Artist</a></li>";
+echo "<li><a href='gaurang/get_artists.php'>Get All Artists</a></li>";
+
+// Category APIs
+echo "<li><a href='gaurang/add_category.php'>Add Category</a></li>";
+echo "<li><a href='gaurang/update_category.php'>Update Category</a></li>";
+echo "<li><a href='gaurang/delete_category.php'>Delete Category</a></li>";
+echo "<li><a href='gaurang/view_all_category.php'>Get All Categories</a></li>";
+
+// Booking APIs
+echo "<li><a href='gaurang/book_artist.php'>Add Booking</a></li>";
+echo "<li><a href='gaurang/update_booking.php'>Update Booking</a></li>";
+echo "<li><a href='gaurang/delete_booking.php'>Delete Booking</a></li>";
+echo "<li><a href='gaurang/view_all_bookings.php'>Get All Bookings</a></li>";
+
+// Review APIs
+echo "<li><a href='gaurang/add_review.php'>Add Review</a></li>";
+echo "<li><a href='gaurang/update_review.php'>Update Review</a></li>";
+echo "<li><a href='gaurang/delete_review.php'>Delete Review</a></li>";
+echo "<li><a href='gaurang/view_all_review.php'>Get All Reviews</a></li>";
+
+// Feedback APIs
+echo "<li><a href='gaurang/add_feedback.php'>Add Feedback</a></li>";
+echo "<li><a href='gaurang/delete_feedback.php'>Delete Feedback</a></li>";
+echo "<li><a href='gaurang/view_all_feedbacks.php'>Get All Feedbacks</a></li>";
+
+// Artist Media APIs
+echo "<li><a 
+echo "<li><a href='gaurang/delete_media.php'>Delete Artist Media</a></li>";
+echo "<li><a href='gaurang/upload_media.php'>Get Artist Media</a></li>";
+echo "<li><a href='gaurang/view_media.php'>View Artist Media</a></li>";
+
+
+echo "</ul>";
+?>
