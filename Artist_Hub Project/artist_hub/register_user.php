@@ -1,5 +1,5 @@
 <?php
-include('../connect.php');
+include('connect.php');
 header('Content-Type: application/json');
 
 $name = $_POST['name'] ?? '';
