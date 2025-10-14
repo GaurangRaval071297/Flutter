@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $id = intval($_POST['id'] ?? 0);
 if (!$id) {
@@ -7,9 +8,9 @@ if (!$id) {
     exit;
 }
 
-$sql = "DELETE FROM gr_categories WHERE category_id = $id";
+$sql = "DELETE FROM gr_users WHERE user_id = $id";
 if ($con->query($sql)) {
-    echo json_encode(['success' => true, 'message' => 'Category deleted']);
+    echo json_encode(['success' => true, 'message' => 'User deleted']);
 } else {
     echo json_encode(['success' => false, 'message' => 'Delete failed']);
 }

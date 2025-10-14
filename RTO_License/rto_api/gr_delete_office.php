@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $id = intval($_POST['office_id'] ?? 0);
 if (!$id) {

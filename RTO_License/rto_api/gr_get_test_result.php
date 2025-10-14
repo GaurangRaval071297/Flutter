@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $test_id = intval($_GET['test_id'] ?? 0);
 if (!$test_id) {

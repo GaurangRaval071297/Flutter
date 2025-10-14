@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $cat = intval($_GET['category_id'] ?? 0);
 

@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $user_id = intval($_POST['user_id'] ?? 0);
 $test_type = $_POST['test_type'] ?? 'mock';

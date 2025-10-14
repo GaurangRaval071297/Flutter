@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $id = intval($_GET['id'] ?? 0);
 $res = $con->query("SELECT user_id, name, email, created_at FROM gr_users WHERE user_id = $id");

@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $cat = intval($_POST['category_id'] ?? 0);
 $question = $_POST['question_text'] ?? '';

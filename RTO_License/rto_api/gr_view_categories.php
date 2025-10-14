@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $res = $con->query("SELECT * FROM gr_categories ORDER BY category_id DESC");
 $data = [];

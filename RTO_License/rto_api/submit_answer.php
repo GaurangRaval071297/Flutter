@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $test_id = intval($_POST['test_id'] ?? 0);
 $question_id = intval($_POST['question_id'] ?? 0);

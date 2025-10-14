@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $id = intval($_GET['id'] ?? 0);
 $res = $con->query("SELECT * FROM gr_questions WHERE question_id = $id");

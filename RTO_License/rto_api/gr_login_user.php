@@ -1,5 +1,6 @@
 <?php
 include 'connect.php';
+header('Content-Type: application/json');
 
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
