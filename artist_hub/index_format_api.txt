@@ -1,5 +1,5 @@
 <?php
-echo "<h2>Gaurang API</h2>";
+echo "<h2>Gaurang Project API</h2>";
 echo "<ul>";
 
 // User APIs
