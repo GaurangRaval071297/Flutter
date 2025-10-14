@@ -3,37 +3,37 @@ echo "<h2>Gaurang RTO APP API</h2>";
 echo "<ul>";
 
 // User APIs
-echo "<li><a href='gr_add_user.php'>Add User</a></li>";
-echo "<li><a href='gr_update_user.php'>Update User</a></li>";
-echo "<li><a href='gr_delete_user.php'>Delete User</a></li>";
-echo "<li><a href='gr_view_users.php'>View All Users</a></li>";
-echo "<li><a href='gr_view_user_by_id.php'>View User By ID</a></li>";
-echo "<li><a href='gr_login_user.php'>Login User</a></li>";
+echo "<li><a href='gaurang/gr_add_user.php'>Add User</a></li>";
+echo "<li><a href='gaurang/gr_update_user.php'>Update User</a></li>";
+echo "<li><a href='gaurang/gr_delete_user.php'>Delete User</a></li>";
+echo "<li><a href='gaurang/gr_view_users.php'>View All Users</a></li>";
+echo "<li><a href='gaurang/gr_view_user_by_id.php'>View User By ID</a></li>";
+echo "<li><a href='gaurang/gr_login_user.php'>Login User</a></li>";
 
 // Category APIs
-echo "<li><a href='gr_add_category.php'>Add Category</a></li>";
-echo "<li><a href='gr_update_category.php'>Update Category</a></li>";
-echo "<li><a href='gr_delete_category.php'>Delete Category</a></li>";
-echo "<li><a href='gr_view_categories.php'>View All Categories</a></li>";
+echo "<li><a href='gaurang/gr_add_category.php'>Add Category</a></li>";
+echo "<li><a href='gaurang/gr_update_category.php'>Update Category</a></li>";
+echo "<li><a href='gaurang/gr_delete_category.php'>Delete Category</a></li>";
+echo "<li><a href='gaurang/gr_view_categories.php'>View All Categories</a></li>";
 
 // Office APIs
-echo "<li><a href='gr_add_office.php'>Add Office</a></li>";
-echo "<li><a href='gr_update_office.php'>Update Office</a></li>";
-echo "<li><a href='gr_delete_office.php'>Delete Office</a></li>";
-echo "<li><a href='gr_view_offices.php'>View All Offices</a></li>";
+echo "<li><a href='gaurang/gr_add_office.php'>Add Office</a></li>";
+echo "<li><a href='gaurang/gr_update_office.php'>Update Office</a></li>";
+echo "<li><a href='gaurang/gr_delete_office.php'>Delete Office</a></li>";
+echo "<li><a href='gaurang/gr_view_offices.php'>View All Offices</a></li>";
 
 // Question APIs
-echo "<li><a href='gr_add_question.php'>Add Question</a></li>";
-echo "<li><a href='gr_update_question.php'>Update Question</a></li>";
-echo "<li><a href='gr_delete_question.php'>Delete Question</a></li>";
-echo "<li><a href='gr_view_questions.php'>View All Questions</a></li>";
-echo "<li><a href='view_question_by_id.php'>View Question By ID</a></li>";
+echo "<li><a href='gaurang/gr_add_question.php'>Add Question</a></li>";
+echo "<li><a href='gaurang/gr_update_question.php'>Update Question</a></li>";
+echo "<li><a href='gaurang/gr_delete_question.php'>Delete Question</a></li>";
+echo "<li><a href='gaurang/gr_view_questions.php'>View All Questions</a></li>";
+echo "<li><a href='gaurang/view_question_by_id.php'>View Question By ID</a></li>";
 
 // Test APIs
-echo "<li><a href='start_test.php'>Start Test</a></li>";
-echo "<li><a href='submit_answer.php'>Submit Answer</a></li>";
-echo "<li><a href='gr_get_test_result.php'>Get Test Result</a></li>";
-echo "<li><a href='view_statistics.php'>View Statistics</a></li>";
+echo "<li><a href='gaurang/start_test.php'>Start Test</a></li>";
+echo "<li><a href='gaurang/submit_answer.php'>Submit Answer</a></li>";
+echo "<li><a href='gaurang/gr_get_test_result.php'>Get Test Result</a></li>";
+echo "<li><a href='gaurang/view_statistics.php'>View Statistics</a></li>";
 
 echo "</ul>";
 ?>
