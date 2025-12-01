@@ -1,26 +1,44 @@
 <?php
-include 'connect.php';
-$data = json_decode(file_get_contents("php://input"), true);
+include 'connect.php'; // mysqli connection: $con
 
-if(!$data || !isset($data['artist_id'], $data['media_url'], $data['media_type'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status"=>false,"message"=>"Only POST method allowed"]);
+    exit;
+}
+
+$artist_id = $_POST['artist_id'] ?? null;
+$media_url = $_POST['media_url'] ?? null;
+$media_type = $_POST['media_type'] ?? null; // expected 'image' or 'video'
+
+if (!$artist_id || !$media_url || !$media_type) {
     echo json_encode(["status"=>false,"message"=>"Missing required fields"]);
     exit;
 }
 
-$artist_id = $data['artist_id'];
-$media_url = $data['media_url'];
-$media_type = $data['media_type']; // expected 'image' or 'video'
-
-if(!in_array($media_type, ['image','video'])) {
+if (!in_array($media_type, ['image', 'video'])) {
     echo json_encode(["status"=>false,"message"=>"Invalid media_type"]);
     exit;
 }
 
 try {
     $stmt = $con->prepare("INSERT INTO g_artist_media (artist_id, media_url, media_type) VALUES (?,?,?)");
-    $stmt->execute([$artist_id, $media_url, $media_type]);
-    echo json_encode(["status"=>true,"message"=>"Media uploaded","media_id"=>$con->lastInsertId()]);
-} catch(PDOException $e) {
-    echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
+    $stmt->bind_param("iss", $artist_id, $media_url, $media_type);
+    $stmt->execute();
+
+    $media_id = $stmt->insert_id;
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Media uploaded successfully",
+        "media_id" => $media_id
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
 }
+
+mysqli_close($con);
 ?>

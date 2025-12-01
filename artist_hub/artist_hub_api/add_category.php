@@ -1,20 +1,34 @@
-    <?php
-    include 'connect.php';
-    $data = json_decode(file_get_contents("php://input"), true);
+<?php
+include 'connect.php'; // mysqli connection: $con
 
-    if(!$data || !isset($data['name'])) {
-        echo json_encode(["status"=>false,"message"=>"Missing category name"]);
-        exit;
-    }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
+    exit;
+}
 
-    $name = $data['name'];
-    $description = $data['description'] ?? null;
+$name = $_POST['name'] ?? null;
+$description = $_POST['description'] ?? null;
 
-    try {
-        $stmt = $con->prepare("INSERT INTO g_categories (name, description) VALUES (?, ?)");
-        $stmt->execute([$name, $description]);
-        echo json_encode(["status"=>true,"message"=>"Category added","category_id"=>$con->lastInsertId()]);
-    } catch(PDOException $e) {
-        echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
-    }
-    ?>
+if (!$name) {
+    echo json_encode(["status" => false, "message" => "Missing category name"]);
+    exit;
+}
+
+try {
+    $stmt = $con->prepare("INSERT INTO g_categories (name, description) VALUES (?, ?)");
+    $stmt->bind_param("ss", $name, $description);
+    $stmt->execute();
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Category added successfully",
+        "category_id" => $stmt->insert_id
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
+}
+?>

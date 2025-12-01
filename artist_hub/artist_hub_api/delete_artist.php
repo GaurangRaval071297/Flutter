@@ -1,19 +1,34 @@
 <?php
-include 'connect.php';
-$data = json_decode(file_get_contents("php://input"), true);
+include 'connect.php'; // mysqli connection: $con
 
-if(!$data || !isset($data['artist_id'])) {
-    echo json_encode(["status"=>false,"message"=>"Missing artist_id"]);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
     exit;
 }
 
-$artist_id = $data['artist_id'];
+$artist_id = $_POST['artist_id'] ?? null;
+
+if (!$artist_id) {
+    echo json_encode(["status" => false, "message" => "Missing artist_id"]);
+    exit;
+}
 
 try {
+
     $stmt = $con->prepare("DELETE FROM g_users WHERE user_id = ? AND role = 'artist'");
-    $stmt->execute([$artist_id]);
-    echo json_encode(["status"=>true,"message"=>"Artist deleted"]);
-} catch(PDOException $e) {
-    echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
+    $stmt->bind_param("i", $artist_id);
+    $stmt->execute();
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Artist deleted successfully"
+    ]);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
 }
 ?>

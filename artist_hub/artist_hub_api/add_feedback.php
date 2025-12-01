@@ -1,20 +1,34 @@
 <?php
-include 'connect.php';
-$data = json_decode(file_get_contents("php://input"), true);
+include 'connect.php'; // mysqli connection: $con
 
-if(!$data || !isset($data['user_id'], $data['message'])) {
-    echo json_encode(["status"=>false,"message"=>"Missing required fields"]);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
     exit;
 }
 
-$user_id = $data['user_id'];
-$message = $data['message'];
+$user_id = $_POST['user_id'] ?? null;
+$message = $_POST['message'] ?? null;
+
+if (!$user_id || !$message) {
+    echo json_encode(["status" => false, "message" => "Missing required fields"]);
+    exit;
+}
 
 try {
     $stmt = $con->prepare("INSERT INTO g_feedbacks (user_id, message) VALUES (?, ?)");
-    $stmt->execute([$user_id, $message]);
-    echo json_encode(["status"=>true,"message"=>"Feedback added","feedback_id"=>$con->lastInsertId()]);
-} catch(PDOException $e) {
-    echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
+    $stmt->bind_param("is", $user_id, $message);
+    $stmt->execute();
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Feedback added successfully",
+        "feedback_id" => $stmt->insert_id
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
 }
 ?>

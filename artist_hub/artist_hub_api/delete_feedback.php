@@ -1,19 +1,34 @@
 <?php
-include 'connect.php';
-$data = json_decode(file_get_contents("php://input"), true);
+include 'connect.php'; // mysqli connection: $con
 
-if(!$data || !isset($data['feedback_id'])) {
-    echo json_encode(["status"=>false,"message"=>"Missing feedback_id"]);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
     exit;
 }
 
-$feedback_id = $data['feedback_id'];
+$feedback_id = $_POST['feedback_id'] ?? null;
+
+if (!$feedback_id) {
+    echo json_encode(["status" => false, "message" => "Missing feedback_id"]);
+    exit;
+}
 
 try {
+
     $stmt = $con->prepare("DELETE FROM g_feedbacks WHERE feedback_id = ?");
-    $stmt->execute([$feedback_id]);
-    echo json_encode(["status"=>true,"message"=>"Feedback deleted"]);
-} catch(PDOException $e) {
-    echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
+    $stmt->bind_param("i", $feedback_id);
+    $stmt->execute();
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Feedback deleted successfully"
+    ]);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
 }
 ?>

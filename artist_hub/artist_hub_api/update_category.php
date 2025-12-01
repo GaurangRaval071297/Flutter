@@ -1,21 +1,42 @@
 <?php
-include 'connect.php';
-$data = json_decode(file_get_contents("php://input"), true);
+include 'connect.php'; // mysqli connection: $con
 
-if(!$data || !isset($data['category_id'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status"=>false,"message"=>"Only POST method allowed"]);
+    exit;
+}
+
+$category_id = $_POST['category_id'] ?? null;
+$name = $_POST['name'] ?? null;
+$description = $_POST['description'] ?? null;
+
+if (!$category_id) {
     echo json_encode(["status"=>false,"message"=>"Missing category_id"]);
     exit;
 }
 
-$category_id = $data['category_id'];
-$name = $data['name'] ?? null;
-$description = $data['description'] ?? null;
-
 try {
-    $stmt = $con->prepare("UPDATE g_categories SET name = COALESCE(?, name), description = COALESCE(?, description) WHERE category_id = ?");
-    $stmt->execute([$name,$description,$category_id]);
-    echo json_encode(["status"=>true,"message"=>"Category updated"]);
-} catch(PDOException $e) {
-    echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
+    $stmt = $con->prepare("
+        UPDATE g_categories
+        SET name = IFNULL(?, name),
+            description = IFNULL(?, description)
+        WHERE category_id = ?
+    ");
+    $stmt->bind_param("ssi", $name, $description, $category_id);
+    $stmt->execute();
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Category updated successfully"
+    ]);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
 }
+
+mysqli_close($con);
 ?>

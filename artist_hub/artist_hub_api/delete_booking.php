@@ -1,19 +1,34 @@
 <?php
-include 'connect.php';
-$data = json_decode(file_get_contents("php://input"), true);
+include 'connect.php'; // mysqli connection: $con
 
-if(!$data || !isset($data['booking_id'])) {
-    echo json_encode(["status"=>false,"message"=>"Missing booking_id"]);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
     exit;
 }
 
-$booking_id = $data['booking_id'];
+$booking_id = $_POST['booking_id'] ?? null;
+
+if (!$booking_id) {
+    echo json_encode(["status" => false, "message" => "Missing booking_id"]);
+    exit;
+}
 
 try {
+
     $stmt = $con->prepare("DELETE FROM g_bookings WHERE booking_id = ?");
-    $stmt->execute([$booking_id]);
-    echo json_encode(["status"=>true,"message"=>"Booking deleted"]);
-} catch(PDOException $e) {
-    echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
+    $stmt->bind_param("i", $booking_id);
+    $stmt->execute();
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Booking deleted successfully"
+    ]);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
 }
 ?>

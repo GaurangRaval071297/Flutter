@@ -1,23 +1,46 @@
 <?php
-include 'connect.php';
-$data = json_decode(file_get_contents("php://input"), true);
+include 'connect.php'; // mysqli connection: $con
 
-if(!$data || !isset($data['booking_id'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status"=>false,"message"=>"Only POST method allowed"]);
+    exit;
+}
+
+$booking_id = $_POST['booking_id'] ?? null;
+$event_date = $_POST['event_date'] ?? null;
+$event_time = $_POST['event_time'] ?? null;
+$location = $_POST['location'] ?? null;
+$status = $_POST['status'] ?? null;
+
+if (!$booking_id) {
     echo json_encode(["status"=>false,"message"=>"Missing booking_id"]);
     exit;
 }
 
-$booking_id = $data['booking_id'];
-$event_date = $data['event_date'] ?? null;
-$event_time = $data['event_time'] ?? null;
-$location = $data['location'] ?? null;
-$status = $data['status'] ?? null;
-
 try {
-    $stmt = $con->prepare("UPDATE g_bookings SET event_date = COALESCE(?, event_date), event_time = COALESCE(?, event_time), location = COALESCE(?, location), status = COALESCE(?, status) WHERE booking_id = ?");
-    $stmt->execute([$event_date,$event_time,$location,$status,$booking_id]);
-    echo json_encode(["status"=>true,"message"=>"Booking updated"]);
-} catch(PDOException $e) {
-    echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
+    $stmt = $con->prepare("
+        UPDATE g_bookings
+        SET event_date = IFNULL(?, event_date),
+            event_time = IFNULL(?, event_time),
+            location = IFNULL(?, location),
+            status = IFNULL(?, status)
+        WHERE booking_id = ?
+    ");
+    $stmt->bind_param("ssssi", $event_date, $event_time, $location, $status, $booking_id);
+    $stmt->execute();
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Booking updated successfully"
+    ]);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
 }
+
+mysqli_close($con);
 ?>

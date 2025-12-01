@@ -1,24 +1,48 @@
 <?php
-include 'connect.php';
-$data = json_decode(file_get_contents("php://input"), true);
+include 'connect.php'; // mysqli connection: $con
 
-if(!$data || !isset($data['user_id'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["status"=>false,"message"=>"Only POST method allowed"]);
+    exit;
+}
+
+$user_id = $_POST['user_id'] ?? null;
+$name = $_POST['name'] ?? null;
+$phone = $_POST['phone'] ?? null;
+$address = $_POST['address'] ?? null;
+$status = $_POST['status'] ?? null;
+$profile_pic = $_POST['profile_pic'] ?? null;
+
+if (!$user_id) {
     echo json_encode(["status"=>false,"message"=>"Missing user_id"]);
     exit;
 }
 
-$user_id = $data['user_id'];
-$name = $data['name'] ?? null;
-$phone = $data['phone'] ?? null;
-$address = $data['address'] ?? null;
-$status = $data['status'] ?? null;
-$profile_pic = $data['profile_pic'] ?? null;
-
 try {
-    $stmt = $con->prepare("UPDATE g_users SET name = COALESCE(?, name), phone = COALESCE(?, phone), address = COALESCE(?, address), status = COALESCE(?, status), profile_pic = COALESCE(?, profile_pic) WHERE user_id = ?");
-    $stmt->execute([$name,$phone,$address,$status,$profile_pic,$user_id]);
-    echo json_encode(["status"=>true,"message"=>"User updated"]);
-} catch(PDOException $e) {
-    echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
+    $stmt = $con->prepare("
+        UPDATE g_users
+        SET name = IFNULL(?, name),
+            phone = IFNULL(?, phone),
+            address = IFNULL(?, address),
+            status = IFNULL(?, status),
+            profile_pic = IFNULL(?, profile_pic)
+        WHERE user_id = ?
+    ");
+    $stmt->bind_param("sssssi", $name, $phone, $address, $status, $profile_pic, $user_id);
+    $stmt->execute();
+
+    echo json_encode([
+        "status" => true,
+        "message" => "User updated successfully"
+    ]);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => $e->getMessage()
+    ]);
 }
+
+mysqli_close($con);
 ?>
