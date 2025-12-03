@@ -1,36 +1,32 @@
 <?php
 header('Content-Type: application/json');
-include 'connect.php'; // MySQLi connection
+include 'connect.php';
 
-// Collect POST data (supports form-data)
-$artist_id  = $_POST['artist_id'] ?? '';
-$media_url  = $_POST['media_url'] ?? '';
-$media_type = $_POST['media_type'] ?? '';
+$artist_id = $_POST['artist_id'] ?? '';
 
-// Validate required fields
-if(empty($artist_id) || empty($media_url) || empty($media_type)){
-    echo json_encode(["status"=>false,"message"=>"Missing required fields"]);
-    exit;
+if (empty($artist_id)) { echo json_encode(['status'=>false,'message'=>'artist_id required']); exit; }
+
+if (!isset($_FILES['media'])) {
+    echo json_encode(['status'=>false,'message'=>'media file required']); exit;
 }
 
-// Validate media_type
-if(!in_array($media_type, ['image','video'])){
-    echo json_encode(["status"=>false,"message"=>"Invalid media_type"]);
-    exit;
-}
+$uploadDir = 'uploads/';
+if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
 
-// Insert into database
-$stmt = mysqli_prepare($con, "INSERT INTO g_artist_media (artist_id, media_url, media_type) VALUES (?, ?, ?)");
-mysqli_stmt_bind_param($stmt, "iss", $artist_id, $media_url, $media_type);
+$file = $_FILES['media'];
+$ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+$filename = uniqid() . '.' . $ext;
+$target = $uploadDir . $filename;
 
-if(mysqli_stmt_execute($stmt)){
-    $media_id = mysqli_insert_id($con);
-    echo json_encode(["status"=>true,"message"=>"Media uploaded","media_id"=>$media_id]);
+if (move_uploaded_file($file['tmp_name'], $target)) {
+    $type = (strpos($file['type'],'video')!==false) ? 'video' : 'image';
+    $q = "INSERT INTO g_artist_media (artist_id, media_url, media_type) VALUES ('$artist_id', '$target', '$type')";
+    if (mysqli_query($con, $q)) {
+        echo json_encode(['status'=>true,'message'=>'Uploaded','media_url'=>$target]);
+    } else {
+        echo json_encode(['status'=>false,'message'=>'DB insert failed']);
+    }
 } else {
-    echo json_encode(["status"=>false,"message"=>mysqli_error($con)]);
+    echo json_encode(['status'=>false,'message'=>'Upload failed']);
 }
-
-// Close connection
-mysqli_stmt_close($stmt);
-mysqli_close($con);
 ?>
