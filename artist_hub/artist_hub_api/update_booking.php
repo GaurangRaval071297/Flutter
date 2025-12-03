@@ -1,46 +1,32 @@
 <?php
-include 'connect.php'; // mysqli connection: $con
+header('Content-Type: application/json');
+include 'connect.php'; // MySQLi connection
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status"=>false,"message"=>"Only POST method allowed"]);
-    exit;
-}
+// Collect POST data (supports JSON or form-data)
+$data = json_decode(file_get_contents("php://input"), true);
 
-$booking_id = $_POST['booking_id'] ?? null;
-$event_date = $_POST['event_date'] ?? null;
-$event_time = $_POST['event_time'] ?? null;
-$location = $_POST['location'] ?? null;
-$status = $_POST['status'] ?? null;
+$booking_id = $data['booking_id'] ?? $_POST['booking_id'] ?? '';
+$event_date = $data['event_date'] ?? $_POST['event_date'] ?? null;
+$event_time = $data['event_time'] ?? $_POST['event_time'] ?? null;
+$location = $data['location'] ?? $_POST['location'] ?? null;
+$status = $data['status'] ?? $_POST['status'] ?? null;
 
-if (!$booking_id) {
+if(empty($booking_id)){
     echo json_encode(["status"=>false,"message"=>"Missing booking_id"]);
     exit;
 }
 
-try {
-    $stmt = $con->prepare("
-        UPDATE g_bookings
-        SET event_date = IFNULL(?, event_date),
-            event_time = IFNULL(?, event_time),
-            location = IFNULL(?, location),
-            status = IFNULL(?, status)
-        WHERE booking_id = ?
-    ");
-    $stmt->bind_param("ssssi", $event_date, $event_time, $location, $status, $booking_id);
-    $stmt->execute();
+// Prepare update statement
+$stmt = mysqli_prepare($con, "UPDATE g_bookings SET event_date = COALESCE(?, event_date), event_time = COALESCE(?, event_time), location = COALESCE(?, location), status = COALESCE(?, status) WHERE booking_id = ?");
+mysqli_stmt_bind_param($stmt, "ssssi", $event_date, $event_time, $location, $status, $booking_id);
 
-    echo json_encode([
-        "status" => true,
-        "message" => "Booking updated successfully"
-    ]);
-
-} catch (Exception $e) {
-
-    echo json_encode([
-        "status" => false,
-        "message" => $e->getMessage()
-    ]);
+if(mysqli_stmt_execute($stmt)){
+    echo json_encode(["status"=>true,"message"=>"Booking updated successfully"]);
+} else {
+    echo json_encode(["status"=>false,"message"=>mysqli_error($con)]);
 }
 
+// Close connection
+mysqli_stmt_close($stmt);
 mysqli_close($con);
 ?>

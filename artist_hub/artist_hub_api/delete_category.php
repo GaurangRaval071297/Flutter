@@ -1,34 +1,49 @@
 <?php
-include 'connect.php'; // mysqli connection: $con
+header('Content-Type: application/json');
+include 'connect.php'; // MySQLi connection
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
-    exit;
-}
+// Get category_id from POST (form-data)
+$category_id = $_POST['category_id'] ?? '';
 
-$category_id = $_POST['category_id'] ?? null;
-
-if (!$category_id) {
-    echo json_encode(["status" => false, "message" => "Missing category_id"]);
-    exit;
-}
-
-try {
-
-    $stmt = $con->prepare("DELETE FROM g_categories WHERE category_id = ?");
-    $stmt->bind_param("i", $category_id);
-    $stmt->execute();
-
-    echo json_encode([
-        "status" => true,
-        "message" => "Category deleted successfully"
-    ]);
-
-} catch (Exception $e) {
-
+if (empty($category_id)) {
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
+        "message" => "Missing category_id"
+    ]);
+    exit;
+}
+
+// Prepare DELETE query
+$stmt = mysqli_prepare($con, "DELETE FROM g_categories WHERE category_id = ?");
+if ($stmt === false) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Prepare failed: " . mysqli_error($con)
+    ]);
+    exit;
+}
+
+mysqli_stmt_bind_param($stmt, "i", $category_id);
+
+if (mysqli_stmt_execute($stmt)) {
+    if (mysqli_stmt_affected_rows($stmt) > 0) {
+        echo json_encode([
+            "status" => true,
+            "message" => "Category deleted successfully"
+        ]);
+    } else {
+        echo json_encode([
+            "status" => false,
+            "message" => "Category not found"
+        ]);
+    }
+} else {
+    echo json_encode([
+        "status" => false,
+        "message" => "Failed to delete category: " . mysqli_error($con)
     ]);
 }
+
+$stmt->close();
+mysqli_close($con);
 ?>

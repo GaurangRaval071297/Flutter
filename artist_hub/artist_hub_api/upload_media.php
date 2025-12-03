@@ -1,44 +1,36 @@
 <?php
-include 'connect.php'; // mysqli connection: $con
+header('Content-Type: application/json');
+include 'connect.php'; // MySQLi connection
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status"=>false,"message"=>"Only POST method allowed"]);
-    exit;
-}
+// Collect POST data (supports form-data)
+$artist_id  = $_POST['artist_id'] ?? '';
+$media_url  = $_POST['media_url'] ?? '';
+$media_type = $_POST['media_type'] ?? '';
 
-$artist_id = $_POST['artist_id'] ?? null;
-$media_url = $_POST['media_url'] ?? null;
-$media_type = $_POST['media_type'] ?? null; // expected 'image' or 'video'
-
-if (!$artist_id || !$media_url || !$media_type) {
+// Validate required fields
+if(empty($artist_id) || empty($media_url) || empty($media_type)){
     echo json_encode(["status"=>false,"message"=>"Missing required fields"]);
     exit;
 }
 
-if (!in_array($media_type, ['image', 'video'])) {
+// Validate media_type
+if(!in_array($media_type, ['image','video'])){
     echo json_encode(["status"=>false,"message"=>"Invalid media_type"]);
     exit;
 }
 
-try {
-    $stmt = $con->prepare("INSERT INTO g_artist_media (artist_id, media_url, media_type) VALUES (?,?,?)");
-    $stmt->bind_param("iss", $artist_id, $media_url, $media_type);
-    $stmt->execute();
+// Insert into database
+$stmt = mysqli_prepare($con, "INSERT INTO g_artist_media (artist_id, media_url, media_type) VALUES (?, ?, ?)");
+mysqli_stmt_bind_param($stmt, "iss", $artist_id, $media_url, $media_type);
 
-    $media_id = $stmt->insert_id;
-
-    echo json_encode([
-        "status" => true,
-        "message" => "Media uploaded successfully",
-        "media_id" => $media_id
-    ]);
-
-} catch (Exception $e) {
-    echo json_encode([
-        "status" => false,
-        "message" => $e->getMessage()
-    ]);
+if(mysqli_stmt_execute($stmt)){
+    $media_id = mysqli_insert_id($con);
+    echo json_encode(["status"=>true,"message"=>"Media uploaded","media_id"=>$media_id]);
+} else {
+    echo json_encode(["status"=>false,"message"=>mysqli_error($con)]);
 }
 
+// Close connection
+mysqli_stmt_close($stmt);
 mysqli_close($con);
 ?>

@@ -1,77 +1,70 @@
 <?php
-include 'connect.php'; // mysqli connection: $con
+header('Content-Type: application/json');
+include 'connect.php'; // MySQLi connection
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
-    exit;
-}
-
-$name = $_POST['name'] ?? null;
-$email = $_POST['email'] ?? null;
-$password = $_POST['password'] ?? null;
-
-if (!$name || !$email || !$password) {
-    echo json_encode(["status" => false, "message" => "Missing required fields"]);
-    exit;
-}
-
-$password_hashed = password_hash($password, PASSWORD_BCRYPT);
-$phone = $_POST['phone'] ?? null;
-$address = $_POST['address'] ?? null;
+// Collect POST data (supports form-data)
+$name = $_POST['name'] ?? '';
+$email = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
+$phone = $_POST['phone'] ?? '';
+$address = $_POST['address'] ?? '';
 $role = 'artist';
-$profile_pic = $_POST['profile_pic'] ?? null;
 
-// Handle categories
-$categories = [];
-if (isset($_POST['categories'])) {
+// Handle profile picture if uploaded
+$profile_pic = null;
+if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+    $uploadDir = 'uploads/';
+    if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
 
-    if (is_array($_POST['categories'])) {
-        $categories = $_POST['categories'];  
-    } else {
-        $categories = array_map('trim', explode(",", $_POST['categories']));
+    $fileName = uniqid() . '_' . basename($_FILES['profile_pic']['name']);
+    $targetFile = $uploadDir . $fileName;
+
+    if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $targetFile)) {
+        $profile_pic = $targetFile;
     }
 }
 
-$con->begin_transaction();
-
-try {
-
-    // Insert into g_users
-    $stmt = $con->prepare(
-        "INSERT INTO g_users (name,email,password,phone,address,role,profile_pic) 
-         VALUES (?,?,?,?,?,?,?)"
-    );
-    $stmt->bind_param("sssssss", $name, $email, $password_hashed, $phone, $address, $role, $profile_pic);
-    $stmt->execute();
-
-    $artist_id = $stmt->insert_id;
-
-    // Insert categories
-    if (!empty($categories)) {
-        $stmt2 = $con->prepare(
-            "INSERT INTO g_artist_category (artist_id, category_id) VALUES (?, ?)"
-        );
-
-        foreach ($categories as $cat_id) {
-            $stmt2->bind_param("ii", $artist_id, $cat_id);
-            $stmt2->execute();
-        }
-    }
-
-    $con->commit();
-
-    echo json_encode([
-        "status" => true,
-        "message" => "Artist added successfully",
-        "artist_id" => $artist_id
-    ]);
-
-} catch (Exception $e) {
-    $con->rollback();
+// Validate required fields
+if (empty($name) || empty($email) || empty($password)) {
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
+        "message" => "Name, email, and password are required"
+    ]);
+    exit;
+}
+
+// Check if email already exists
+$check = mysqli_query($con, "SELECT * FROM g_users WHERE email='$email'");
+if (!$check) {
+    echo json_encode(["status" => false, "message" => "Database error: " . mysqli_error($con)]);
+    exit;
+}
+
+if (mysqli_num_rows($check) > 0) {
+    echo json_encode(["status" => false, "message" => "Email is already registered"]);
+    exit;
+}
+
+// Hash password
+$password_hashed = password_hash($password, PASSWORD_BCRYPT);
+
+// Insert user
+$insert = mysqli_query($con, "INSERT INTO g_users (name, email, password, phone, address, role, profile_pic) 
+                              VALUES ('$name', '$email', '$password_hashed', '$phone', '$address', '$role', '$profile_pic')");
+
+if ($insert) {
+    $user_id = mysqli_insert_id($con);
+    echo json_encode([
+        "status" => true,
+        "message" => "Artist registered successfully",
+        "artist_id" => $user_id
+    ]);
+} else {
+    echo json_encode([
+        "status" => false,
+        "message" => "Failed to register artist: " . mysqli_error($con)
     ]);
 }
 
+mysqli_close($con);
 ?>

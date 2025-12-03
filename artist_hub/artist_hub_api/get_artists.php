@@ -1,6 +1,8 @@
 <?php
+header('Content-Type: application/json');
 include 'connect.php'; // MySQLi connection
 
+// Fetch all artists with their categories
 $sql = "
     SELECT u.user_id, u.name, u.email, u.phone, u.address, u.profile_pic, u.status, u.created_at,
            GROUP_CONCAT(ac.category_id) AS category_ids
@@ -14,9 +16,15 @@ $result = mysqli_query($con, $sql);
 
 if ($result) {
     $artists = mysqli_fetch_all($result, MYSQLI_ASSOC); // Fetch all rows as associative array
-    echo json_encode(["status" => true, "artists" => $artists]);
+    echo json_encode([
+        "status" => true,
+        "artists" => $artists
+    ]);
 } else {
-    echo json_encode(["status" => false, "message" => mysqli_error($con)]);
+    echo json_encode([
+        "status" => false,
+        "message" => mysqli_error($con)
+    ]);
 }
 
 // Close the connection

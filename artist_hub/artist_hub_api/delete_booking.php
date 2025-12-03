@@ -1,34 +1,50 @@
 <?php
-include 'connect.php'; // mysqli connection: $con
+header('Content-Type: application/json');
+include 'connect.php'; // MySQLi connection
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
-    exit;
-}
+// Get booking_id from POST (form-data)
+$booking_id = $_POST['booking_id'] ?? '';
 
-$booking_id = $_POST['booking_id'] ?? null;
-
-if (!$booking_id) {
-    echo json_encode(["status" => false, "message" => "Missing booking_id"]);
-    exit;
-}
-
-try {
-
-    $stmt = $con->prepare("DELETE FROM g_bookings WHERE booking_id = ?");
-    $stmt->bind_param("i", $booking_id);
-    $stmt->execute();
-
-    echo json_encode([
-        "status" => true,
-        "message" => "Booking deleted successfully"
-    ]);
-
-} catch (Exception $e) {
-
+if (empty($booking_id)) {
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
+        "message" => "Missing booking_id"
+    ]);
+    exit;
+}
+
+// Prepare DELETE query
+$stmt = mysqli_prepare($con, "DELETE FROM g_bookings WHERE booking_id = ?");
+if ($stmt === false) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Prepare failed: " . mysqli_error($con)
+    ]);
+    exit;
+}
+
+mysqli_stmt_bind_param($stmt, "i", $booking_id);
+
+if (mysqli_stmt_execute($stmt)) {
+    if (mysqli_stmt_affected_rows($stmt) > 0) {
+        echo json_encode([
+            "status" => true,
+            "message" => "Booking deleted successfully"
+        ]);
+    } else {
+        echo json_encode([
+            "status" => false,
+            "message" => "Booking not found"
+        ]);
+    }
+} else {
+    echo json_encode([
+        "status" => false,
+        "message" => "Failed to delete booking: " . mysqli_error($con)
     ]);
 }
+
+$stmt->close();
+mysqli_close($con);
 ?>
+x

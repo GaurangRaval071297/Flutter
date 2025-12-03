@@ -1,34 +1,43 @@
 <?php
-include 'connect.php'; // mysqli connection: $con
+header('Content-Type: application/json');
+include 'connect.php'; // MySQLi connection
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
+// Collect POST data (supports form-data)
+$user_id = $_POST['user_id'] ?? '';
+$message = $_POST['message'] ?? '';
+
+// Validate required fields
+if (empty($user_id) || empty($message)) {
+    echo json_encode([
+        "status" => false,
+        "message" => "User ID and message are required"
+    ]);
     exit;
 }
 
-$user_id = $_POST['user_id'] ?? null;
-$message = $_POST['message'] ?? null;
-
-if (!$user_id || !$message) {
-    echo json_encode(["status" => false, "message" => "Missing required fields"]);
+// Insert feedback
+$stmt = mysqli_prepare($con, "INSERT INTO g_feedbacks (user_id, message) VALUES (?, ?)");
+if ($stmt === false) {
+    echo json_encode(["status" => false, "message" => "Prepare failed: ".mysqli_error($con)]);
     exit;
 }
 
-try {
-    $stmt = $con->prepare("INSERT INTO g_feedbacks (user_id, message) VALUES (?, ?)");
-    $stmt->bind_param("is", $user_id, $message);
-    $stmt->execute();
+mysqli_stmt_bind_param($stmt, "is", $user_id, $message);
 
+if (mysqli_stmt_execute($stmt)) {
+    $feedback_id = mysqli_insert_id($con);
     echo json_encode([
         "status" => true,
         "message" => "Feedback added successfully",
-        "feedback_id" => $stmt->insert_id
+        "feedback_id" => $feedback_id
     ]);
-
-} catch (Exception $e) {
+} else {
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
+        "message" => "Failed to add feedback: ".mysqli_error($con)
     ]);
 }
+
+$stmt->close();
+mysqli_close($con);
 ?>

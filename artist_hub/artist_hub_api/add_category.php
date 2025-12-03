@@ -1,34 +1,49 @@
 <?php
-include 'connect.php'; // mysqli connection: $con
+header('Content-Type: application/json');
+include 'connect.php'; // MySQLi connection
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status" => false, "message" => "Only POST method allowed"]);
+// Collect POST data from form-data
+$name = $_POST['name'] ?? '';
+$description = $_POST['description'] ?? '';
+
+// Validate required field
+if (empty($name)) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Category name is required"
+    ]);
     exit;
 }
 
-$name = $_POST['name'] ?? null;
-$description = $_POST['description'] ?? null;
-
-if (!$name) {
-    echo json_encode(["status" => false, "message" => "Missing category name"]);
+// Check if category already exists
+$check = mysqli_query($con, "SELECT * FROM g_categories WHERE name='$name'");
+if (!$check) {
+    echo json_encode(["status" => false, "message" => "Database error: ".mysqli_error($con)]);
     exit;
 }
 
-try {
-    $stmt = $con->prepare("INSERT INTO g_categories (name, description) VALUES (?, ?)");
-    $stmt->bind_param("ss", $name, $description);
-    $stmt->execute();
+if (mysqli_num_rows($check) > 0) {
+    echo json_encode(["status" => false, "message" => "Category already exists"]);
+    exit;
+}
 
+// Insert category
+$insert = mysqli_query($con, "INSERT INTO g_categories (name, description) VALUES ('$name', '$description')");
+
+if ($insert) {
+    $category_id = mysqli_insert_id($con);
     echo json_encode([
         "status" => true,
         "message" => "Category added successfully",
-        "category_id" => $stmt->insert_id
+        "category_id" => $category_id
     ]);
-
-} catch (Exception $e) {
+} else {
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
+        "message" => "Failed to add category: ".mysqli_error($con)
     ]);
 }
+
+// Close connection
+mysqli_close($con);
 ?>

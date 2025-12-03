@@ -1,70 +1,55 @@
 <?php
-include 'connect.php'; // mysqli connection: $con
+header('Content-Type: application/json');
+include 'connect.php'; // MySQLi connection
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status"=>false,"message"=>"Only POST method allowed"]);
-    exit;
-}
+// Collect POST data (supports form-data or JSON)
+$data = json_decode(file_get_contents("php://input"), true);
 
-$artist_id = $_POST['artist_id'] ?? null;
-$name = $_POST['name'] ?? null;
-$phone = $_POST['phone'] ?? null;
-$address = $_POST['address'] ?? null;
-$status = $_POST['status'] ?? null;
-$profile_pic = $_POST['profile_pic'] ?? null;
-$categories = isset($_POST['categories']) ? $_POST['categories'] : null; // CSV or array
+$artist_id = $data['artist_id'] ?? $_POST['artist_id'] ?? '';
+$name = $data['name'] ?? $_POST['name'] ?? null;
+$phone = $data['phone'] ?? $_POST['phone'] ?? null;
+$address = $data['address'] ?? $_POST['address'] ?? null;
+$status = $data['status'] ?? $_POST['status'] ?? null;
+$profile_pic = $data['profile_pic'] ?? $_POST['profile_pic'] ?? null;
+$categories = $data['categories'] ?? $_POST['categories'] ?? null; // optional array
 
-if (!$artist_id) {
+if(empty($artist_id)){
     echo json_encode(["status"=>false,"message"=>"Missing artist_id"]);
     exit;
 }
 
-mysqli_autocommit($con, false);
+// Start transaction
+mysqli_begin_transaction($con);
 
 try {
+    // Update artist details
+    $stmt = mysqli_prepare($con, "UPDATE g_users SET name = COALESCE(?, name), phone = COALESCE(?, phone), address = COALESCE(?, address), status = COALESCE(?, status), profile_pic = COALESCE(?, profile_pic) WHERE user_id = ? AND role = 'artist'");
+    mysqli_stmt_bind_param($stmt, "sssssi", $name, $phone, $address, $status, $profile_pic, $artist_id);
+    mysqli_stmt_execute($stmt);
 
-    $stmt = $con->prepare("
-        UPDATE g_users 
-        SET name = IFNULL(?, name),
-            phone = IFNULL(?, phone),
-            address = IFNULL(?, address),
-            status = IFNULL(?, status),
-            profile_pic = IFNULL(?, profile_pic)
-        WHERE user_id = ? AND role = 'artist'
-    ");
-    $stmt->bind_param("sssssi", 
-        $name, $phone, $address, $status, $profile_pic, $artist_id
-    );
-    $stmt->execute();
+    // Update categories if provided
+    if(!empty($categories) && is_array($categories)) {
+        // Delete old categories
+        $del = mysqli_prepare($con, "DELETE FROM g_artist_category WHERE artist_id = ?");
+        mysqli_stmt_bind_param($del, "i", $artist_id);
+        mysqli_stmt_execute($del);
 
-    // categories update
-    if ($categories) {
-        // If categories sent as CSV string, convert to array
-        if (!is_array($categories)) {
-            $categories = array_map('trim', explode(",", $categories));
-        }
-
-        $del = $con->prepare("DELETE FROM g_artist_category WHERE artist_id = ?");
-        $del->bind_param("i", $artist_id);
-        $del->execute();
-
-        $ins = $con->prepare("INSERT INTO g_artist_category (artist_id, category_id) VALUES (?, ?)");
-        foreach ($categories as $cat_id) {
-            if (!empty($cat_id)) {
-                $ins->bind_param("ii", $artist_id, $cat_id);
-                $ins->execute();
-            }
+        // Insert new categories
+        $ins = mysqli_prepare($con, "INSERT INTO g_artist_category (artist_id, category_id) VALUES (?, ?)");
+        foreach($categories as $cat_id) {
+            mysqli_stmt_bind_param($ins, "ii", $artist_id, $cat_id);
+            mysqli_stmt_execute($ins);
         }
     }
 
     mysqli_commit($con);
     echo json_encode(["status"=>true,"message"=>"Artist updated successfully"]);
 
-} catch (Exception $e) {
+} catch(Exception $e) {
     mysqli_rollback($con);
     echo json_encode(["status"=>false,"message"=>$e->getMessage()]);
 }
 
-mysqli_autocommit($con, true);
+// Close connection
 mysqli_close($con);
 ?>
