@@ -2,31 +2,26 @@
 header('Content-Type: application/json');
 include 'connect.php';
 
-$artist_id = $_POST['artist_id'] ?? '';
+$artist_user_id = $_POST['artist_user_id'] ?? '';
+if ($artist_user_id == '') { echo json_encode(['status'=>false,'message'=>'artist_user_id required']); exit; }
+if (!isset($_FILES['media'])) { echo json_encode(['status'=>false,'message'=>'media file required']); exit; }
 
-if (empty($artist_id)) { echo json_encode(['status'=>false,'message'=>'artist_id required']); exit; }
-
-if (!isset($_FILES['media'])) {
-    echo json_encode(['status'=>false,'message'=>'media file required']); exit;
-}
-
-$uploadDir = 'uploads/';
-if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
+$uploadDir = __DIR__ . '/uploads/';
+if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
 $file = $_FILES['media'];
-$ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-$filename = uniqid() . '.' . $ext;
-$target = $uploadDir . $filename;
+$ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+$newName = time() . '_' . rand(1000,9999) . '.' . $ext;
+$target = $uploadDir . $newName;
 
-if (move_uploaded_file($file['tmp_name'], $target)) {
-    $type = (strpos($file['type'],'video')!==false) ? 'video' : 'image';
-    $q = "INSERT INTO g_artist_media (artist_id, media_url, media_type) VALUES ('$artist_id', '$target', '$type')";
-    if (mysqli_query($con, $q)) {
-        echo json_encode(['status'=>true,'message'=>'Uploaded','media_url'=>$target]);
-    } else {
-        echo json_encode(['status'=>false,'message'=>'DB insert failed']);
-    }
+if (!move_uploaded_file($file['tmp_name'], $target)) {
+    echo json_encode(['status'=>false,'message'=>'Upload failed']); exit;
+}
+
+$type = (strpos($file['type'],'video')!==false) ? 'video' : 'image';
+if (mysqli_query($con, "INSERT INTO g_artist_media (artist_id, media_url, media_type) VALUES ('$artist_user_id','$newName','$type')")) {
+    echo json_encode(['status'=>true,'message'=>'Media uploaded','media_url'=>$newName]);
 } else {
-    echo json_encode(['status'=>false,'message'=>'Upload failed']);
+    echo json_encode(['status'=>false,'message'=>'DB insert failed']);
 }
 ?>

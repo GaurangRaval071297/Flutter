@@ -2,37 +2,19 @@
 header('Content-Type: application/json');
 include 'connect.php';
 
-$email = $_POST['email'] ?? '';
+$email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
 
-if (empty($email) || empty($password)) {
-    echo json_encode(['status' => false, 'message' => 'Email and password required']);
-    exit;
+if ($email == '' || $password == '') { echo json_encode(['status'=>false,'message'=>'Email and password required']); exit; }
+
+$q = mysqli_query($con, "SELECT password FROM g_users WHERE email='$email' LIMIT 1");
+if (!$q || mysqli_num_rows($q) == 0) {
+    echo json_encode(['status'=>false,'message'=>'Invalid Email or Password']); exit;
 }
-
-$q = mysqli_query($con, "SELECT * FROM g_users WHERE email='$email'");
-if ($q && mysqli_num_rows($q) == 1) {
-
-    $user = mysqli_fetch_assoc($q);
-
-    if (password_verify($password, $user['password'])) {
-
-        echo json_encode([
-            'status' => true,
-            'message' => 'Login successful'
-        ]);
-
-    } else {
-        echo json_encode([
-            'status' => false,
-            'message' => 'Invalid Email or Password'
-        ]);
-    }
-
+$row = mysqli_fetch_assoc($q);
+if (password_verify($password, $row['password'])) {
+    echo json_encode(['status'=>true,'message'=>'Login successful']);
 } else {
-    echo json_encode([
-        'status' => false,
-        'message' => 'Email not found'
-    ]);
+    echo json_encode(['status'=>false,'message'=>'Invalid Email or Password']);
 }
 ?>

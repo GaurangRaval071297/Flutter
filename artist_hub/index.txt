@@ -1,0 +1,39 @@
+<?php
+echo "<h2>Gaurang Project API </h2>";
+echo "<ul>";
+
+// Add APIs
+echo "<li><a href='gaurang/add_artist_category.php'>add_artist_category</a></li>";
+echo "<li><a href='gaurang/add_booking.php'>add_booking</a></li>";
+echo "<li><a href='gaurang/add_category.php'>add_category</a></li>";
+echo "<li><a href='gaurang/add_feedback.php'>add_feedback</a></li>";
+echo "<li><a href='gaurang/add_review.php'>add_review</a></li>";
+echo "<li><a href='gaurang/approve_artist.php'>approve_artist</a></li>";
+echo "<li><a href='gaurang/assign_category_to_artist.php'>assign_category_to_artist</a></li>";
+echo "<li><a href='gaurang/delete_booking.php'>delete_booking</a></li>";
+echo "<li><a href='gaurang/delete_category.php'>delete_category</a></li>";
+echo "<li><a href='gaurang/delete_user.php'>delete_user</a></li>";
+echo "<li><a href='gaurang/edit_category.php'>edit_category</a></li>";
+echo "<li><a href='gaurang/edit_user.php'>edit_user</a></li>";
+echo "<li><a href='gaurang/login.php'>login</a></li>";
+echo "<li><a href='gaurang/register.php'>register</a></li>";
+echo "<li><a href='gaurang/update_booking_status.php'>update_booking_status</a></li>";
+echo "<li><a href='gaurang/upload_media.php'>upload_media</a></li>";
+
+// View APIs
+echo "<li><a href='gaurang/view_artist_bookings.php'>view_artist_bookings</a></li>";
+echo "<li><a href='gaurang/view_artist_categories.php'>view_artist_categories</a></li>";
+echo "<li><a href='gaurang/view_artists.php'>view_artists</a></li>";
+echo "<li><a href='gaurang/view_artists_by_category.php'>view_artists_by_category</a></li>";
+echo "<li><a href='gaurang/view_categories.php'>view_categories</a></li>";
+echo "<li><a href='gaurang/view_customer_bookings.php'>view_customer_bookings</a></li>";
+echo "<li><a href='gaurang/view_feedback.php'>view_feedback</a></li>";
+echo "<li><a href='gaurang/view_media.php'>view_media</a></li>";
+echo "<li><a href='gaurang/view_reviews.php'>view_reviews</a></li>";
+echo "<li><a href='gaurang/view_user.php'>view_user</a></li>";
+echo "<li><a href='gaurang/view_users.php'>view_users</a></li>";
+echo "<li><a href='gaurang/view_bookings.php'>view_bookings</a></li>";
+
+// Close list
+echo "</ul>";
+?>
