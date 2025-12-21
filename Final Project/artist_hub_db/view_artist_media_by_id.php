@@ -1,33 +1,43 @@
 <?php
 include "connect.php";
 
-/* INPUTS */
+/* INPUT */
 $artist_id = intval($_GET['artist_id'] ?? 0);
 
-if ($artist_id <= 0) response(false,"Artist ID required");
+if($artist_id <= 0) response(false,"Artist ID is required");
 
-/* CHECK ARTIST */
+/* Verify artist */
 $chk = mysqli_query($conn,"
 SELECT id FROM g_users 
 WHERE id='$artist_id' AND role='artist' AND is_active=1
 ");
-if (mysqli_num_rows($chk)==0) response(false,"Artist not found");
+if(mysqli_num_rows($chk)==0) response(false,"Artist not found");
 
-/* FETCH MEDIA */
+/* Fetch artist posts with counts */
 $q = mysqli_query($conn,"
 SELECT 
-m.*,
-(SELECT COUNT(*) FROM g_likes WHERE artist_media_id=m.id) AS like_count,
-(SELECT COUNT(*) FROM g_comments WHERE artist_media_id=m.id) AS comment_count,
-(SELECT COUNT(*) FROM g_shares WHERE artist_media_id=m.id) AS share_count
+    m.id AS media_id,
+    m.media_type,
+    m.media_url,
+    m.caption,
+    m.created_at,
+
+    (SELECT COUNT(*) FROM g_likes WHERE artist_media_id = m.id) AS total_likes,
+    (SELECT COUNT(*) FROM g_comments WHERE artist_media_id = m.id) AS total_comments,
+    (SELECT COUNT(*) FROM g_shares WHERE artist_media_id = m.id) AS total_shares
+
 FROM g_artist_media m
 WHERE m.artist_id='$artist_id'
-ORDER BY m.created_at DESC
+ORDER BY m.id DESC
 ");
 
-$data = [];
+$posts = [];
 while($row = mysqli_fetch_assoc($q)){
-    $data[] = $row;
+    $posts[] = $row;
 }
 
-response(true,"Artist media fetched",$data);
+if(count($posts)==0){
+    response(true,"No posts found",[]);
+}
+
+response(true,"Artist posts fetched successfully",$posts);
