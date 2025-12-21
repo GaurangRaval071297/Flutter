@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 21, 2025 at 09:05 AM
+-- Generation Time: Dec 21, 2025 at 07:41 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.0.25
 
@@ -56,7 +56,8 @@ CREATE TABLE `g_artist_media` (
 --
 
 INSERT INTO `g_artist_media` (`id`, `artist_id`, `media_type`, `media_url`, `caption`, `created_at`) VALUES
-(1, 17, 'image', 'ghfd', 'kjghfghjkhgfd', '2025-12-21 08:01:37');
+(1, 17, 'image', 'ghfd', 'kjghfghjkhgfd', '2025-12-21 08:01:37'),
+(2, 17, 'image', 'uploads/images/1766329177_1368.jpg', 'kjghfghjkhgfd', '2025-12-21 14:59:37');
 
 -- --------------------------------------------------------
 
@@ -158,6 +159,24 @@ CREATE TABLE `g_likes` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `artist_media_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `g_payments`
+--
+
+CREATE TABLE `g_payments` (
+  `id` int(11) NOT NULL,
+  `booking_id` int(11) DEFAULT NULL,
+  `customer_id` int(11) DEFAULT NULL,
+  `artist_id` int(11) DEFAULT NULL,
+  `amount` decimal(10,2) DEFAULT NULL,
+  `payment_method` enum('online','cash') DEFAULT NULL,
+  `payment_status` enum('pending','paid','failed','refunded') DEFAULT NULL,
+  `transaction_id` varchar(150) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -287,6 +306,12 @@ ALTER TABLE `g_likes`
   ADD KEY `artist_media_id` (`artist_media_id`);
 
 --
+-- Indexes for table `g_payments`
+--
+ALTER TABLE `g_payments`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `g_reviews`
 --
 ALTER TABLE `g_reviews`
@@ -321,7 +346,7 @@ ALTER TABLE `g_admins`
 -- AUTO_INCREMENT for table `g_artist_media`
 --
 ALTER TABLE `g_artist_media`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `g_artist_profile`
@@ -351,6 +376,12 @@ ALTER TABLE `g_feedback`
 -- AUTO_INCREMENT for table `g_likes`
 --
 ALTER TABLE `g_likes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `g_payments`
+--
+ALTER TABLE `g_payments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
