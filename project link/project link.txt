@@ -1,0 +1,5 @@
+Artist Hub Admin:
+https://github.com/GaurangRaval071297/artist_hub_admin/releases/tag/v1.0.1
+
+Artist Hub User:
+https://github.com/GaurangRaval071297/artist_hub/releases/tag/v1.0.2
